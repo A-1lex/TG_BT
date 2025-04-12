@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: trackhunt-bot
+    env: python
+    plan: free
+    buildCommand: ""
+    startCommand: python bot.py
+    envVars:
+      - key: API_TOKEN
+        value: <8046318140:AAHpB_VICu0ApAng1eI1EWeSg_LvZvDZZXo>
+      - key: MUSIC_DIR
+        value: music
+      - key: VIDEO_DIR
+        value: videos
