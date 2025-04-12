@@ -1,4 +1,3 @@
-
 import os
 import logging
 import yt_dlp
@@ -10,11 +9,13 @@ from aiogram.filters import Command
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.types import FSInputFile, CallbackQuery
 from aiogram.utils.keyboard import InlineKeyboardBuilder
+from dotenv import load_dotenv
 
-API_TOKEN = '8046318140:AAHpB_VICu0ApAng1eI1EWeSg_LvZvDZZXo'
-YOUTUBE_API_KEY = 'AIzaSyDdrSfckg-ey8cV_r8fw4QReFuHdWTot00'
-MUSIC_DIR = 'music'
-VIDEO_DIR = 'videos'
+load_dotenv()
+API_TOKEN = os.getenv("API_TOKEN")
+YOUTUBE_API_KEY = os.getenv("YOUTUBE_API_KEY")
+MUSIC_DIR = os.getenv("MUSIC_DIR", "music")
+VIDEO_DIR = os.getenv("VIDEO_DIR", "videos")
 
 os.makedirs(MUSIC_DIR, exist_ok=True)
 os.makedirs(VIDEO_DIR, exist_ok=True)
@@ -54,7 +55,6 @@ async def show_audio_page(message_or_callback, user_id: int, edit: bool = False)
     data = user_queries[user_id]
     page = data["page"]
     results = data["results"]
-
     start = page * 10
     end = start + 10
     entries = results[start:end]
@@ -65,7 +65,6 @@ async def show_audio_page(message_or_callback, user_id: int, edit: bool = False)
 
     message_text = f"<i>Ось деякі результати:{data['query']}</i>"
     keyboard = InlineKeyboardBuilder()
-
     for entry in entries:
         title = entry.get('title', 'Без назви')[:40]
         author = entry.get('uploader', 'Невідомий')
@@ -76,11 +75,9 @@ async def show_audio_page(message_or_callback, user_id: int, edit: bool = False)
             duration_str = f"{minutes}:{seconds:02d}"
         else:
             duration_str = "?:??"
-
         video_id = entry.get('id')
-        button_text = f"{title}\n{author} | {duration_str}"
+        button_text = f"{title}{author} | {duration_str}"
         keyboard.button(text=button_text, callback_data=f"aud_{video_id}")
-
     keyboard.adjust(1)
 
     nav_row = []
@@ -90,7 +87,6 @@ async def show_audio_page(message_or_callback, user_id: int, edit: bool = False)
     if end < len(results):
         nav_row.append(types.InlineKeyboardButton(text="➡️", callback_data="page_next"))
     keyboard.row(*nav_row)
-
     keyboard.row(types.InlineKeyboardButton(
         text="☕ Купити каву автору",
         url="https://send.monobank.ua/jar/7hLa8gjD1Z"
@@ -105,9 +101,7 @@ async def show_audio_page(message_or_callback, user_id: int, edit: bool = False)
 async def download_selected_audio(callback: CallbackQuery):
     video_id = callback.data.replace("aud_", "")
     url = f"https://www.youtube.com/watch?v={video_id}"
-
     loading_msg = await callback.message.answer("⏳ Зачекайте, йде завантаження...")
-
     ydl_opts = {
         'format': 'bestaudio/best',
         'outtmpl': os.path.join(MUSIC_DIR, '%(id)s.%(ext)s'),
@@ -118,12 +112,10 @@ async def download_selected_audio(callback: CallbackQuery):
         }],
         'quiet': True
     }
-
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=True)
             file_path = ydl.prepare_filename(info).replace(".webm", ".mp3").replace(".m4a", ".mp3")
-
         audio_file = FSInputFile(file_path)
         await bot.send_audio(callback.message.chat.id, audio=audio_file, title=info['title'])
     finally:
@@ -148,13 +140,10 @@ async def download_all_tracks(callback: CallbackQuery):
     page = data["page"]
     results = data["results"]
     entries = results[page * 10:(page + 1) * 10]
-
     await callback.message.answer(f"⬇️ Завантаження {len(entries)} треків...")
-
     for entry in entries:
         video_id = entry['id']
         url = f"https://www.youtube.com/watch?v={video_id}"
-
         ydl_opts = {
             'format': 'bestaudio/best',
             'outtmpl': os.path.join(MUSIC_DIR, '%(id)s.%(ext)s'),
@@ -165,11 +154,9 @@ async def download_all_tracks(callback: CallbackQuery):
             }],
             'quiet': True
         }
-
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=True)
             file_path = ydl.prepare_filename(info).replace(".webm", ".mp3").replace(".m4a", ".mp3")
-
         audio_file = FSInputFile(file_path)
         await bot.send_audio(callback.message.chat.id, audio=audio_file, title=info['title'])
 
