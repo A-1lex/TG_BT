@@ -1,9 +1,0 @@
-services:
-  - type: web
-    name: telegram-music-bot
-    env: python
-    plan: free
-    buildCommand: pip install -r requirements.txt
-    startCommand: python bot.py
-    envVars:
-      - fromDotEnv: true

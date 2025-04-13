@@ -3,6 +3,7 @@ import logging
 import yt_dlp
 import asyncio
 
+from keep_alive import keep_alive
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.enums import ParseMode
 from aiogram.filters import Command
@@ -161,4 +162,5 @@ async def download_all_tracks(callback: CallbackQuery):
         await bot.send_audio(callback.message.chat.id, audio=audio_file, title=info['title'])
 
 if __name__ == "__main__":
+    keep_alive()  # запуск Flask-сервера
     asyncio.run(dp.start_polling(bot))
