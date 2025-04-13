@@ -10,6 +10,7 @@ from aiogram.filters import Command
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.types import FSInputFile, CallbackQuery
 from aiogram.utils.keyboard import InlineKeyboardBuilder
+from aiogram.client.default import DefaultBotProperties  # <- Ось цей імпорт
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -21,7 +22,7 @@ VIDEO_DIR = os.getenv("VIDEO_DIR", "videos")
 os.makedirs(MUSIC_DIR, exist_ok=True)
 os.makedirs(VIDEO_DIR, exist_ok=True)
 
-bot = Bot(token=API_TOKEN, parse_mode=ParseMode.HTML)
+bot = Bot(token=API_TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 dp = Dispatcher(storage=MemoryStorage())
 logging.basicConfig(level=logging.INFO)
 
