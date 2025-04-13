@@ -161,6 +161,7 @@ async def download_all_tracks(callback: CallbackQuery):
                 'preferredcodec': 'mp3',
                 'preferredquality': '192',
             }],
+            'cookies.txt'
             'quiet': True
         }
 
