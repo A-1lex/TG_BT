@@ -162,5 +162,5 @@ async def download_all_tracks(callback: CallbackQuery):
         await bot.send_audio(callback.message.chat.id, audio=audio_file, title=info['title'])
 
 if __name__ == "__main__":
-    keep_alive()  # запуск Flask-сервера
+    keep_alive()
     asyncio.run(dp.start_polling(bot))
